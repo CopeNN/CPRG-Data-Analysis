@@ -14,12 +14,17 @@ NEI <- as.data.frame(NEI)
 sectors <- "sectors_toNAICS.xlsx"
 sectors <- read_excel(sectors)
 sectors <- as.data.frame(sectors)
+colnames(sectors)[4] <- "primary naics code"
 
 #Read in qry_rulesBySector data from access database
-groups <- "sectors_toNAICS.xlsx"
+SPPD_groups <- "qry_rulesBySector.xlsx"
 groups <- read_excel(groups)
 groups <- as.data.frame(groups)
 
+
+NEI_SPPDsectors <- merge(NEI, sectors, by = "primary naics code", all.x=TRUE)
+
+NEI_SPPDgroup <- merge(NEI_SPPDsectors, SPPD_groups)
 
 
 
