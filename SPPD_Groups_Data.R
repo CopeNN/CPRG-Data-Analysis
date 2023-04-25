@@ -4,28 +4,54 @@
 
 #Import library to read in excel files
 library(readxl)
+library(dplyr)
 
 #Read in 2020 NEI data from AQAD
 NEI <- "emis_sum_fac_2020NEI_v2_April 19 2023.xlsx"
 NEI <- read_excel(NEI)
 NEI <- as.data.frame(NEI)
 
-#Read in sectors_toNAICS data from access database
-sectors <- "sectors_toNAICS.xlsx"
-sectors <- read_excel(sectors)
-sectors <- as.data.frame(sectors)
-colnames(sectors)[4] <- "primary naics code"
-
-#Read in qry_rulesBySector data from access database
-SPPD_groups <- "qry_rulesBySector.xlsx"
-groups <- read_excel(groups)
-groups <- as.data.frame(groups)
+#Read in sectors_toNAICS_ToSPPDGroup data from access database
+sectors_SPPDgrp <- "sectors_ToNAICS_ToSPPDGroup.xlsx"
+sectors_SPPDgrp <- read_excel(sectors_SPPDgrp)
+sectors_SPPDgrp <- as.data.frame(sectors_SPPDgrp)
+colnames(sectors_SPPDgrp)[3] <- "primary naics code"
 
 
-NEI_SPPDsectors <- merge(NEI, sectors, by = "primary naics code", all.x=TRUE)
+#Merge sectors with NEI data by NAICS
+NEI_sectors_SPPDgrp <- merge(NEI, sectors_SPPDgrp, by = "primary naics code", all.x=TRUE)
 
-NEI_SPPDgroup <- merge(NEI_SPPDsectors, SPPD_groups)
+#Edit SPPD group labels
+NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$sector_3 == "Commercial Sterilization" & !is.na(NEI_sectors_SPPDgrp$sector_3), "SPPD Group"] <- "MMG"
+NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$sector_3 == "Oil and Gas Production and Distribution" & !is.na(NEI_sectors_SPPDgrp$sector_3), "SPPD Group"] <- "FIG"
+NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$`primary naics description` == "Drycleaning and Laundry Services (except Coin-Operated)" & !is.na(NEI_sectors_SPPDgrp$sector_3), "SPPD Group"] <- "MICG"
+NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$`primary naics description` == "Oil and Gas Pipeline and Related Structures Construction" & !is.na(NEI_sectors_SPPDgrp$sector_3), "SPPD Group"] <- "FIG"
+NEI_sectors_SPPDgrp$`SPPD Group`[NEI_sectors_SPPDgrp$`SPPD Group` == "CCG"] <- "MMG"
 
+#Split NEI data based on SPPD group
+FIG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "FIG")
+MMG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "MMG")
+RCG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "RCG")
+ESG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "ESG")
+MICG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "MICG")
+NRG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "NRG")
 
-
+#Split NEI data based on industry sector
+NEI_sectors_SPPDgrp$sector_2 <- factor(NEI_sectors_SPPDgrp$sector_2)
+agriculture <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[1]))
+chemicals <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[2]))
+commercial <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[3]))
+construction <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[4]))
+manufacturing <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[5]))
+electric <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[6]))
+metals <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[7]))
+institutions <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[8]))
+indust_prod <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[9]))
+minerals <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[10]))
+misc <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[11]))
+oilgas <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[12]))
+petro <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[13]))
+private <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[14]))
+trans <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[15]))
+waste <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[16]))
 
