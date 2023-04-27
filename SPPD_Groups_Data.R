@@ -22,6 +22,9 @@ colnames(sectors_SPPDgrp)[3] <- "primary naics code"
 #Merge sectors with NEI data by NAICS
 NEI_sectors_SPPDgrp <- merge(NEI, sectors_SPPDgrp, by = "primary naics code", all.x=TRUE)
 
+#Remove facilities that have 0 CO2 equivalence (GHGCO2e = 0)
+NEI_sectors_SPPDgrp <- NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$`GHG CO2e` != 0, ]
+
 #Edit SPPD group labels
 NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$sector_3 == "Commercial Sterilization" & !is.na(NEI_sectors_SPPDgrp$sector_3), "SPPD Group"] <- "MMG"
 NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$sector_3 == "Oil and Gas Production and Distribution" & !is.na(NEI_sectors_SPPDgrp$sector_3), "SPPD Group"] <- "FIG"
@@ -30,21 +33,21 @@ NEI_sectors_SPPDgrp[NEI_sectors_SPPDgrp$`primary naics description` == "Oil and 
 NEI_sectors_SPPDgrp$`SPPD Group`[NEI_sectors_SPPDgrp$`SPPD Group` == "CCG"] <- "MMG"
 
 #Split NEI data based on SPPD group
-FIG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "FIG")
-MMG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "MMG")
-RCG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "RCG")
-ESG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "ESG")
-MICG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "MICG")
-NRG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "NRG")
+#FIG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "FIG")
+#MMG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "MMG")
+#RCG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "RCG")
+#ESG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "ESG")
+#MICG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "MICG")
+#NRG <- filter(NEI_sectors_SPPDgrp, `SPPD Group` == "NRG")
 
 #write files for SPPD groups
-path <- "C:/Users/NCOPE/OneDrive - Environmental Protection Agency (EPA)/CPRG-Data-Analysis/SPPD Groups/"
-write.csv(FIG, file = paste0(path, "FIG", ".csv"))
-write.csv(MMG, file = paste0(path, "MMG", ".csv"))
-write.csv(RCG, file = paste0(path, "RCG", ".csv"))
-write.csv(ESG, file = paste0(path, "ESG", ".csv"))
-write.csv(MICG, file = paste0(path, "MICG", ".csv"))
-write.csv(NRG, file = paste0(path, "NRG", ".csv"))
+#path <- "C:/Users/NCOPE/OneDrive - Environmental Protection Agency (EPA)/CPRG-Data-Analysis/SPPD Groups/"
+#write.csv(FIG, file = paste0(path, "FIG", ".csv"))
+#write.csv(MMG, file = paste0(path, "MMG", ".csv"))
+#write.csv(RCG, file = paste0(path, "RCG", ".csv"))
+#write.csv(ESG, file = paste0(path, "ESG", ".csv"))
+#write.csv(MICG, file = paste0(path, "MICG", ".csv"))
+#write.csv(NRG, file = paste0(path, "NRG", ".csv"))
 
 NEI_sectors_SPPDgrp <- subset (NEI_sectors_SPPDgrp, select = -`SPPD Group`)
 
@@ -63,27 +66,27 @@ minerals <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sec
 misc <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[11]))
 oilgas <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[12]))
 petro <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[13]))
-private <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[14]))
-trans <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[15]))
-waste <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[16]))
+#private <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[14]))
+trans <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[14]))
+waste <- as.data.frame(filter(NEI_sectors_SPPDgrp, sector_2 == levels(NEI_sectors_SPPDgrp$sector_2)[15]))
 
-#Write excel files for industry sectors
-path <- "C:/Users/NCOPE/OneDrive - Environmental Protection Agency (EPA)/CPRG-Data-Analysis/Industry Sectors/"
-write.csv(agriculture, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[1],".csv"))
-write.csv(chemicals, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[2],".csv"))
-write.csv(commercial, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[3],".csv"))
-write.csv(construction, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[4],".csv"))
-write.csv(manufacturing, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[5],".csv"))
-write.csv(electric, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[6],".csv"))
-write.csv(metals, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[7],".csv"))
-write.csv(institutions, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[8],".csv"))
-write.csv(indust_prod, file = paste0(path,"Industrial Production",".csv"))
-write.csv(minerals, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[10],".csv"))
-write.csv(misc, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[11],".csv"))
-write.csv(oilgas, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[12],".csv"))
-write.csv(petro, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[13],".csv"))
-write.csv(private, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[14],".csv"))
-write.csv(trans, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[15],".csv"))
-write.csv(waste, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[16],".csv"))
+#Write excel files for industry sectors. Remove facilities that have zero GHGCO2e
+path <- "C:/Users/NCOPE/OneDrive - Environmental Protection Agency (EPA)/CPRG-Data-Analysis/Industry Sectors (revised)/"
+write.csv(agriculture, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[1],"_GHGCO2e_Revised.csv"))
+write.csv(chemicals, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[2],"_GHGCO2e_Revised.csv"))
+write.csv(commercial, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[3],"_GHGCO2e_Revised.csv"))
+write.csv(construction, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[4],"_GHGCO2e_Revised.csv"))
+write.csv(manufacturing, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[5],"_GHGCO2e_Revised.csv"))
+write.csv(electric, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[6],"_GHGCO2e_Revised.csv"))
+write.csv(metals, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[7],"_GHGCO2e_Revised.csv"))
+write.csv(institutions, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[8],"_GHGCO2e_Revised.csv"))
+write.csv(indust_prod, file = paste0(path,"Industrial Production","_GHGCO2e_Revised.csv"))
+write.csv(minerals, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[10],"_GHGCO2e_Revised.csv"))
+write.csv(misc, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[11],"_GHGCO2e_Revised.csv"))
+write.csv(oilgas, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[12],"_GHGCO2e_Revised.csv"))
+write.csv(petro, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[13],"_GHGCO2e_Revised.csv"))
+#write.csv(private, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[14],".csv"))
+write.csv(trans, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[14],"_GHGCO2e_Revised.csv"))
+write.csv(waste, file = paste0(path,levels(NEI_sectors_SPPDgrp$sector_2)[15],"_GHGCO2e_Revised.csv"))
 
 
